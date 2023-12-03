@@ -9,3 +9,63 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum UserRole {
+  AUTHOR
+  Borrower
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  name      String
+  username  String    @unique @db.VarChar(100)
+  email     String?   @unique @db.VarChar(100)
+  password  String
+  role      UserRole
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Author    Author?
+  Borrower  Borrower?
+}
+
+model Author {
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int    @id
+  books  Book[]
+}
+
+model Book {
+  id               Int                @id @default(autoincrement())
+  title            String             @db.VarChar(255)
+  quantity         Int
+  ISBN             String             @unique @db.VarChar(255)
+  shelfLocation    String             @db.VarChar(255)
+  author           Author             @relation(fields: [authorId], references: [userId])
+  authorId         Int
+  BorrowingProcess BorrowingProcess[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+}
+
+model Borrower {
+  user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId           Int                @id
+  BorrowingProcess BorrowingProcess[]
+}
+
+model BorrowingProcess {
+  id         Int                  @id @default(autoincrement())
+  type       BorrowingProcessType
+  borrower   Borrower             @relation(fields: [borrowerId], references: [userId])
+  borrowerId Int
+  book       Book                 @relation(fields: [bookId], references: [id])
+  bookId     Int
+  dueDate    DateTime?
+  createdAt  DateTime             @default(now())
+  updatedAt  DateTime             @updatedAt
+}
+
+enum BorrowingProcessType {
+  CHECKOUT
+  RETURN
+}
