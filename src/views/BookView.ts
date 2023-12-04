@@ -1,110 +1,77 @@
-import {getAllBooks, createBook} from '../controllers/BookController';
+import {getAllBooks, createBook, getBook, updateBook, deleteBook, searchBooksByQuery} from '../controllers/BookController';
+import handlePrismaError from '../validators/PrismaValidator'
+
 
 const getAll = async (req: any, res: any) => {
     try {
         
-        const { page = 1, count = 10 } = req.query;
+        const { page = 1, count = 10 } = req.params;
         const { books, booksCount } = await getAllBooks(page, count); 
         return res.status(200).json({ data: books, total: booksCount, page });
     } catch (error) {
-        return res.status(400).json({ message: `Error: ${error}` });
+        return res.status(400).json(handlePrismaError(error));
     }
 };
 
 const create = async (req: any, res: any) => {
     try {
         
-        const { title, quantity, isbn, shelfLocation, authorId } = req.body;
-        const book  = await createBook(title, quantity, isbn, shelfLocation, authorId); 
+        const { title, quantity, isbn, shelfLocation, authorId, authorName } = req.body;
+        const book  = await createBook(title, quantity, isbn, shelfLocation, authorId, authorName); 
+        if(!book) return res.status(400).json({ Error: `The Book was not created, please make sure you have entered a valid data` })
         return res.status(201).json({ data: book });
     } catch (error) {
-        return res.status(400).json({ message: `Error: ${error}` });
+        return res.status(400).json(handlePrismaError(error));
     }
 };
 
-// const get = async (req, res) => {
-//     try {
-//         const book = await Book.findOne({ where: { id: req.params.id } });
+const get = async (req: any, res: any) => {
+    try {
+        const id = res.locals.id;
+        const book = await getBook(id); 
+        return res.status(200).json({ book: book });
+    } catch (error) {
+        return res.status(400).json(handlePrismaError(error));
+    }
+};
 
-//         return requestHandler.sendSuccess(
-//             res,
-//             "book fetched successfully"
-//         )({ book });
-//     } catch (error) {
-//         return requestHandler.sendError(req, res, error);
-//     }
-// };
+const update = async (req: any, res: any) => {
+    try {
+        const { id, title, quantity, isbn, shelfLocation, authorId, authorName } = req.body;
+        const book = await updateBook( id, title, quantity, isbn, shelfLocation, authorId, authorName ); 
+        return res.status(200).json({ book: book });
+    } catch (error) {
+        return res.status(400).json(handlePrismaError(error));
+    }
+};
 
+const destroy = async (req: any, res: any) => {
+    try {
+        
+        const id = res.locals.id;
+        const book = await deleteBook(id); 
+        return res.status(200).json({ message: 'Book was deleted successfuly!' });
+    } catch (error) {
+        return res.status(400).json(handlePrismaError(error));
+    }
+};
 
-//         return requestHandler.sendSuccess(
-//             res,
-//             "book created successfully"
-//         )({ book });
-//     } catch (error) {
-//         return requestHandler.sendError(req, res, error);
-//     }
-// };
-
-// const update = async (req, res) => {
-//     try {
-//         const book = await Book.update(
-//             {
-//                 title: req.body.title,
-//                 author: req.body.author,
-//                 isbn: req.body.isbn,
-//                 quantity: req.body.quantity,
-//                 shelf_location: req.body.shelf_location,
-//             },
-//             {
-//                 where: {
-//                     id: req.params.id,
-//                 },
-//             }
-//         );
-
-//         return requestHandler.sendSuccess(res, "book updated successfuly")({});
-//     } catch (error) {
-//         return requestHandler.sendError(req, res, error);
-//     }
-// };
-
-// const destroy = async (req, res) => {
-//     try {
-//         const book = await Book.destroy({ where: { id: req.params.id } });
-
-//         return requestHandler.sendSuccess(res, "book deleted successfuly")({});
-//     } catch (error) {
-//         return requestHandler.sendError(req, res, error);
-//     }
-// };
-
-// const search = async (req, res) => {
-//     try {
-//         const books = await Book.findAndCountAll({
-//             where: {
-//                 [Op.or]: [
-//                     { title: { [Op.like]: req.params.query + "%" } },
-//                     { author: { [Op.like]: req.params.query + "%" } },
-//                     { isbn: { [Op.like]: req.params.query + "%" } },
-//                 ],
-//             },
-//         });
-
-//         const result = books.rows;
-//         return requestHandler.sendSuccess(
-//             res,
-//             `you have ${books.count} search results`
-//         )({ result });
-//     } catch (error) {
-//         return requestHandler.sendError(req, res, error);
-//     }
-// };
+const search = async (req: any, res: any) => {
+    try {
+        
+        const searchQuery = res.locals.query;
+        const books = await searchBooksByQuery(searchQuery); 
+        return res.status(200).json({ books: books });
+    } catch (error) {
+        return res.status(400).json(handlePrismaError(error));
+    }
+};
 
 export {
     getAll,
-    // get,
+    get,
     create,
-    // update,
-    // destroy,
-    // search,
+    update,
+    destroy,
+    search,
 };

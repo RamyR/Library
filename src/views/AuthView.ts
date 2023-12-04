@@ -1,4 +1,5 @@
 import {register, login} from '../controllers/AuthController'
+import handlePrismaError from '../validators/PrismaValidator'
 
 /**
  * @async
@@ -15,7 +16,7 @@ const registerView = async (req: any, res: any) => {
         }
         return res.status(200).json({ token });
     } catch (error) {
-        return res.status(400).json({ "error": {"message": "Something Went Wrong!"} });
+        return res.status(400).json(handlePrismaError(error));
     }
 };
 
@@ -35,7 +36,7 @@ const loginView = async (req: any, res: any) => {
         }
         return res.status(200).json({ token });
     } catch (error) {
-        return res.status(500).json({ error });
+        return res.status(400).json(handlePrismaError(error));
     }
 };
 

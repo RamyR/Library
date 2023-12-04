@@ -1,5 +1,5 @@
 import prisma from "../config/db";
-import { User} from '@prisma/client';
+import { User, UserRole} from '@prisma/client';
 
 /**
  * @async
@@ -17,6 +17,26 @@ export const getUsers = async (skip: number, take: number) => {
     });
     return users;
 };
+
+
+/**
+ * @async
+ * @description get borrowers
+ * @param  {int} skip - pagination offset
+ * @param  {int} take - pagination limit
+ */
+export const getBorrowers = async (skip: number, take: number, ) => {
+    const users = await prisma.user.findMany({
+        where: {role: UserRole.BORROWER},
+        skip,
+        take,
+        orderBy: {
+            name: "desc",
+        },
+    });
+    return users;
+};
+
 
 /**
  * @async
@@ -73,7 +93,7 @@ export const createOneUser = async (data: Omit<User, 'id' | 'createdAt' | 'updat
  * @param  {int} id - user id
  * @param  {Object} data - user data
  */
-export const updateOneUser = async (id: number, data: Omit<User, 'id' | 'createdAt' | 'updatedAt'>) => {
+export const updateOneUser = async (id: number, data: Partial<Omit<User, 'id' | 'createdAt' | 'updatedAt'>>) => {
     const user = await prisma.user.update({ where: { id: id }, data: data });
     return user;
 };
