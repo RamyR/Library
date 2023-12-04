@@ -11,8 +11,8 @@ datasource db {
 }
 
 enum UserRole {
-  AUTHOR
-  Borrower
+  BORROWER
+  ADMIN
 }
 
 model User {
@@ -24,13 +24,14 @@ model User {
   role      UserRole
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  Author    Author?
   Borrower  Borrower?
+
+  @@index(fields: [name, username])
 }
 
 model Author {
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId Int    @id
+  id        Int       @id @default(autoincrement())
+  name      String
   books  Book[]
 }
 
@@ -38,13 +39,16 @@ model Book {
   id               Int                @id @default(autoincrement())
   title            String             @db.VarChar(255)
   quantity         Int
-  ISBN             String             @unique @db.VarChar(255)
+  isbn             String             @unique @db.VarChar(255)
   shelfLocation    String             @db.VarChar(255)
-  author           Author             @relation(fields: [authorId], references: [userId])
+  author           Author             @relation(fields: [authorId], references: [id])
   authorId         Int
   BorrowingProcess BorrowingProcess[]
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
+
+  @@unique([authorId, title], name: "bookIdentifier")
+  @@index(fields: [isbn, title])
 }
 
 model Borrower {
