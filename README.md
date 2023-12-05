@@ -118,7 +118,7 @@ The structure of response
 In case of error
 ```http
 {
-    "message": "borrower is not defined",
+    "message": "Record To Delete OR Update was not found!",
 }
 ```
 
