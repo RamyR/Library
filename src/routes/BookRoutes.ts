@@ -5,13 +5,14 @@ import {getAll,
     update,
     destroy,
     search} from '../views/BookView'
-import {getBooksValidationMiddleware, createBookValidationMiddleware, bookByIdValidationMiddleware, updateBookValidationMiddleware, searchBookValidationMiddleware} from '../middlewares/BookValidatorMiddleware'
+import {getBooksValidationMiddleware, createBookValidationMiddleware, bookByIdValidationMiddleware, updateBookValidationMiddleware, searchBookValidationMiddleware} from '../middlewares/BookMiddleware'
 import {authenticateToken, checkIsAdmin} from '../middlewares/AuthMiddleware'
+import rateLimitMiddleware  from '../middlewares/RateLimiterMiddleware'
 
 
 const router = express.Router();
 
-router.get('/list', authenticateToken, checkIsAdmin, getBooksValidationMiddleware,getAll);
+router.get('/list', rateLimitMiddleware, authenticateToken, checkIsAdmin, getBooksValidationMiddleware,getAll);
 router.get('/:id', authenticateToken, bookByIdValidationMiddleware, get);
 router.post('/create', authenticateToken, checkIsAdmin, createBookValidationMiddleware, create);
 router.put('/update', authenticateToken, checkIsAdmin , updateBookValidationMiddleware, update);

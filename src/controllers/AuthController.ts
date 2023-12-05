@@ -8,6 +8,7 @@ import {
     createOneUser,
     updateOneUser,
     deleteOneUser,
+    createOneBorrower
 } from "../dataAccess/User";
 import { UserRole } from "@prisma/client";
 
@@ -39,6 +40,9 @@ const register = async (
         password: hashedPassword,
         role,
     });
+    if(role == UserRole.BORROWER && newUser){
+        createOneBorrower({userId: newUser.id})
+    }
     const token = jwt.sign(
         {
             id: newUser.id,

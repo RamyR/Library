@@ -1,5 +1,5 @@
 import prisma from "../config/db";
-import { User, UserRole} from '@prisma/client';
+import { User, UserRole, Borrower} from '@prisma/client';
 
 /**
  * @async
@@ -85,6 +85,17 @@ export const createOneUser = async (data: Omit<User, 'id' | 'createdAt' | 'updat
     console.log("New User",data)
     const user = await prisma.user.create({ data: data });
     return user;
+};
+
+/**
+ * @async
+ * @description get users
+ * @param  {Object} data - user data
+ */
+export const createOneBorrower = async (data: Omit<Borrower,'createdAt' | 'updatedAt' | 'user'>) => {
+    console.log("New Borrower ",data)
+    const borrower = await prisma.borrower.create({ data: data });
+    return borrower;
 };
 
 /**

@@ -1,5 +1,3 @@
-import Joi from "joi";
-
 import { allBooksSchema, createBooksSchema, updateBookSchema, bookByIdSchema, searchQuerySchema } from "../validators/BookValidator";
 
 export const getBooksValidationMiddleware = (req: any, res: any, next: any) => {

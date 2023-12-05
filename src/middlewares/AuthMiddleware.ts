@@ -31,6 +31,13 @@ const checkIsAdmin = async (req: any, res: any, next: any) => {
     next();
 };
 
+const checkIsBorrower = async (req: any, res: any, next: any) => {
+    if (req.user.role !== UserRole.BORROWER) {
+        return res.status(401).json({ message: "You are not authorized! You must be a borrower!" });
+    }
+    next();
+};
+
 const registerUserValidationMiddware = (req: any, res: any, next: any) => {
     const result = registerUserSchema.validate(req.body);
     if (result.error) {
@@ -54,4 +61,5 @@ export {
     registerUserValidationMiddware,
     authenticateToken,
     checkIsAdmin,
+    checkIsBorrower,
 };

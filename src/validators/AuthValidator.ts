@@ -12,7 +12,7 @@ const registerUserSchema = Joi.object().keys({
             'object.regex': `Must have at least 8 characters`,
             "string.pattern.base": "Must have at least 8 characters and alphanumeric only..."
         }),
-    role: Joi.string().required()
+    role: Joi.string().valid("BORROWER", "ADMIN").required()
 });
 
 const loginUserSchema = Joi.object().keys({
